@@ -29,7 +29,20 @@ go get -u github.com/wyz9527/timeoutTicker
 ```
 
 ## 示列
-test.go
+模拟场景：将一个未付款订单信息，1天后状态改成关闭
+### test.php
+```php
+<?php
+	$key = 'TEST:queue:try_%d';
+	$redis = new Redis();
+	$redis->connect('127.0.0.1', 6379, 60));
+	$orderId = 1;
+	$expireTime = time() + 86400;
+	//将需要处理的订单id加入到需要监听的redis 队列
+	$redis->rpush(sprintf($key,$expireTime), $orderId)
+```
+
+### test.go
 ```go
 package main
 
@@ -51,7 +64,7 @@ func main()  {
 //具体的业务执行方法
 func myTest( queues string) error {
   fmt.Println(queues) //queues 就是监控的rediskey 的具体值
-  //执行具体业务，
+  //拿到队列queues, 获取队列里面的订单id，执行具体业务，将订单状态改成关闭
   //也可以用其他语言处理具体业务，再使用 exec.Command()去调用
 	return  nil
 }
